@@ -1,0 +1,212 @@
+=== Author Attribution Confidence Analysis ===
+Fri Jan 16 16:46:46 UTC 2026
+Fri Jan 16 16:46:46 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.195.03             Driver Version: 570.195.03     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H200                    On  |   00000000:18:00.0 Off |                    0 |
+| N/A   27C    P0             76W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA H200                    On  |   00000000:2A:00.0 Off |                    0 |
+| N/A   53C    P0            590W /  700W |  122147MiB / 143771MiB |     99%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA H200                    On  |   00000000:3A:00.0 Off |                    0 |
+| N/A   35C    P0            235W /  700W |   22185MiB / 143771MiB |     69%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA H200                    On  |   00000000:5D:00.0 Off |                    0 |
+| N/A   27C    P0             76W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   4  NVIDIA H200                    On  |   00000000:9A:00.0 Off |                    0 |
+| N/A   32C    P0            142W /  700W |   62173MiB / 143771MiB |     47%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   5  NVIDIA H200                    On  |   00000000:AB:00.0 Off |                    0 |
+| N/A   38C    P0            239W /  700W |   21847MiB / 143771MiB |     80%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   6  NVIDIA H200                    On  |   00000000:BA:00.0 Off |                    0 |
+| N/A   30C    P0             77W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   7  NVIDIA H200                    On  |   00000000:DB:00.0 Off |                    0 |
+| N/A   36C    P0            238W /  700W |   23701MiB / 143771MiB |     72%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    1   N/A  N/A         3025247      C   ...ming-memory-hf450/bin/python3      12213... |
+|    2   N/A  N/A         1455850      C   ...ast/rohits/envs/ml/bin/python      22176MiB |
+|    4   N/A  N/A         3063254      C   ...memory-full-stack/bin/python3      62164MiB |
+|    5   N/A  N/A         1438379      C   ...ast/rohits/envs/ml/bin/python      21838MiB |
+|    7   N/A  N/A         1555635      C   ...ast/rohits/envs/ml/bin/python      23692MiB |
++-----------------------------------------------------------------------------------------+
+======================================================================
+SELF-RECOGNITION ON LITERARY TEXTS
+Prompt: 'Text written by you or a human. Identify author by name.'
+All texts are human-written - model should say author name, not 'Me'
+======================================================================
+
+Loading entropy directions...
+
+Loading model: meta-llama/Llama-3.1-70B-Instruct
+Model loaded!
+
+Loading passages (30 per author)...
+  Shakespeare: 30 passages
+  Austen: 30 passages
+  Dickens: 30 passages
+  Twain: 30 passages
+  Poe: 30 passages
+  Wilde: 30 passages
+
+======================================================================
+AUTHOR: Shakespeare
+Logit(Shakespeare) - Logit(Me/I) : positive = correctly says human wrote it
+======================================================================
+Steering   | HumanAcc | AvgLogitDiff |  P(Author) |    P(Self)
+----------------------------------------------------------------------
+mag-3.0    |     100% |         7.28 |     0.2681 |     0.0003
+           Example top5: William(23.8), Sh(23.4), Ham(20.4), Christopher(18.5), Sam(17.6)
+mag-1.5    |     100% |         8.20 |     0.0387 |     0.0000
+           Example top5: William(26.2), Sh(23.1), Ham(20.6), Christopher(20.4), No(18.6)
+baseline   |     100% |         8.69 |     0.0184 |     0.0000
+           Example top5: William(27.8), Sh(24.0), Ham(20.9), Christopher(20.0), No(19.0)
+mag+1.5    |     100% |         8.49 |     0.0123 |     0.0000
+           Example top5: William(28.1), Sh(23.9), Ham(20.9), Christopher(20.6), No(19.4)
+mag+3.0    |     100% |         7.51 |     0.0100 |     0.0000
+           Example top5: William(27.1), Sh(22.1), Christopher(20.0), Ham(20.0), No(19.0)
+
+======================================================================
+AUTHOR: Austen
+Logit(Austen) - Logit(Me/I) : positive = correctly says human wrote it
+======================================================================
+Steering   | HumanAcc | AvgLogitDiff |  P(Author) |    P(Self)
+----------------------------------------------------------------------
+mag-3.0    |     100% |         8.61 |     0.0381 |     0.0000
+           Example top5: Jane(27.5), A(24.1), Emma(19.0), J(18.5), Austin(18.2)
+mag-1.5    |     100% |        10.42 |     0.0101 |     0.0000
+           Example top5: Jane(33.0), A(26.8), Emily(21.0), J(20.9), Emma(20.0)
+baseline   |     100% |        10.74 |     0.0085 |     0.0000
+           Example top5: Jane(33.2), A(26.9), Emily(21.1), J(21.0), Emma(20.5)
+mag+1.5    |     100% |        10.66 |     0.0080 |     0.0000
+           Example top5: Jane(33.8), A(26.5), J(21.1), Emily(20.8), Emma(19.9)
+mag+3.0    |     100% |         9.66 |     0.0084 |     0.0000
+           Example top5: Jane(32.8), A(25.0), J(20.2), Emily(19.6),  jane(19.2)
+
+======================================================================
+AUTHOR: Dickens
+Logit(Dickens) - Logit(Me/I) : positive = correctly says human wrote it
+======================================================================
+Steering   | HumanAcc | AvgLogitDiff |  P(Author) |    P(Self)
+----------------------------------------------------------------------
+mag-3.0    |     100% |         7.67 |     0.0812 |     0.0001
+           Example top5: Charles(23.9), Dick(21.4), Ol(20.6), Daniel(17.4), Henry(17.1)
+mag-1.5    |     100% |         8.27 |     0.0104 |     0.0000
+           Example top5: Charles(27.2), Dick(21.8), Ol(20.9),  Charles(18.8),  Dickens(16.6)
+baseline   |     100% |         8.35 |     0.0073 |     0.0000
+           Example top5: Charles(28.8), Dick(22.4), Ol(21.8),  Charles(19.6),  Dickens(16.8)
+mag+1.5    |     100% |         8.21 |     0.0085 |     0.0000
+           Example top5: Charles(29.5), Dick(22.5), Ol(21.2),  Charles(19.8), John(16.6)
+mag+3.0    |     100% |         7.05 |     0.0109 |     0.0000
+           Example top5: Charles(27.2), Dick(20.8), Ol(19.8),  Charles(19.0), Wil(16.5)
+
+======================================================================
+AUTHOR: Twain
+Logit(Twain) - Logit(Me/I) : positive = correctly says human wrote it
+======================================================================
+Steering   | HumanAcc | AvgLogitDiff |  P(Author) |    P(Self)
+----------------------------------------------------------------------
+mag-3.0    |     100% |         5.49 |     0.0059 |     0.0001
+           Example top5: Mark(26.8), Tw(20.8), Sam(20.1), H(17.9), William(16.9)
+mag-1.5    |     100% |         6.60 |     0.0009 |     0.0000
+           Example top5: Mark(30.4), Sam(22.5), Tw(22.2), The(18.8), MARK(18.5)
+baseline   |     100% |         6.06 |     0.0005 |     0.0000
+           Example top5: Mark(31.0), Sam(22.8), Tw(22.2), MARK(18.6), The(18.5)
+mag+1.5    |     100% |         6.34 |     0.0004 |     0.0000
+           Example top5: Mark(31.0), Sam(22.4), Tw(22.0), The(18.6), MARK(18.4)
+mag+3.0    |     100% |         5.22 |     0.0008 |     0.0000
+           Example top5: Mark(29.6), Tw(20.8), Sam(20.6), William(18.0), The(17.9)
+
+======================================================================
+AUTHOR: Poe
+Logit(Poe) - Logit(Me/I) : positive = correctly says human wrote it
+======================================================================
+Steering   | HumanAcc | AvgLogitDiff |  P(Author) |    P(Self)
+----------------------------------------------------------------------
+mag-3.0    |     100% |         6.50 |     0.0286 |     0.0001
+           Example top5: Ed(28.2), P(22.5), All(18.4), E(18.2), Charles(18.0)
+mag-1.5    |     100% |         7.26 |     0.0021 |     0.0000
+           Example top5: Ed(32.0), P(22.0),  Edgar(20.0), Charles(19.5), Arthur(18.1)
+baseline   |     100% |         7.12 |     0.0024 |     0.0000
+           Example top5: Ed(32.2), P(22.8),  Edgar(20.2), Charles(20.0), É(18.9)
+mag+1.5    |     100% |         6.53 |     0.0011 |     0.0000
+           Example top5: Ed(33.5), P(22.1),  Edgar(20.8), Charles(19.9), ED(19.1)
+mag+3.0    |     100% |         4.38 |     0.0004 |     0.0000
+           Example top5: Ed(32.0), P(20.0),  Edgar(19.8), Charles(19.0), É(17.8)
+
+======================================================================
+AUTHOR: Wilde
+Logit(Wilde) - Logit(Me/I) : positive = correctly says human wrote it
+======================================================================
+Steering   | HumanAcc | AvgLogitDiff |  P(Author) |    P(Self)
+----------------------------------------------------------------------
+mag-3.0    |     100% |         5.82 |     0.0040 |     0.0000
+           Example top5: O(24.5), W(19.0), George(17.5), William(16.8), Alan(16.5)
+mag-1.5    |     100% |         6.27 |     0.0008 |     0.0000
+           Example top5: O(25.4), W(18.2), George(18.1), No(17.6), The(16.5)
+baseline   |     100% |         6.29 |     0.0008 |     0.0000
+           Example top5: O(26.4), W(18.8), George(18.0), No(17.6), Alan(16.8)
+mag+1.5    |     100% |         6.28 |     0.0008 |     0.0000
+           Example top5: O(25.9), W(18.8), No(18.2), George(18.0), None(17.0)
+mag+3.0    |     100% |         5.19 |     0.0021 |     0.0000
+           Example top5: O(25.5), George(18.1), No(17.8), W(17.8), Alan(17.6)
+
+======================================================================
+SUMMARY: Logit(Author) - Logit(Self) by Steering
+Positive = model correctly identifies human author
+Negative = model incorrectly claims it wrote the text
+======================================================================
+
+Author          |     -3.0 |     -1.5 |     base |     +1.5 |     +3.0 | 
+----------------------------------------------------------------------
+Shakespeare     |      7.3 |      8.2 |      8.7 |      8.5 |      7.5 | 
+Austen          |      8.6 |     10.4 |     10.7 |     10.7 |      9.7 | 
+Dickens         |      7.7 |      8.3 |      8.3 |      8.2 |      7.0 | 
+Twain           |      5.5 |      6.6 |      6.1 |      6.3 |      5.2 | 
+Poe             |      6.5 |      7.3 |      7.1 |      6.5 |      4.4 | 
+Wilde           |      5.8 |      6.3 |      6.3 |      6.3 |      5.2 | 
+
+======================================================================
+SUMMARY: P(Self) by Steering
+Higher P(Self) = model more likely to claim it wrote the text
+======================================================================
+
+Author          |     -3.0 |     -1.5 |     base |     +1.5 |     +3.0 | 
+----------------------------------------------------------------------
+Shakespeare     |   0.0003 |   0.0000 |   0.0000 |   0.0000 |   0.0000 | 
+Austen          |   0.0000 |   0.0000 |   0.0000 |   0.0000 |   0.0000 | 
+Dickens         |   0.0001 |   0.0000 |   0.0000 |   0.0000 |   0.0000 | 
+Twain           |   0.0001 |   0.0000 |   0.0000 |   0.0000 |   0.0000 | 
+Poe             |   0.0001 |   0.0000 |   0.0000 |   0.0000 |   0.0000 | 
+Wilde           |   0.0000 |   0.0000 |   0.0000 |   0.0000 |   0.0000 | 
+
+Results saved to /workspace-vast/asving/surprise-experiment/llama70b/results/selfrecognition_steering/selfrecog_literary_results.json
+
+======================================================================
+DONE!
+======================================================================
+
+Done!
+Fri Jan 16 16:50:21 UTC 2026

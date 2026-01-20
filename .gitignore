@@ -1,0 +1,8 @@
+*.aux
+*.log
+*.nav
+*.snm
+*.toc
+*.synctex.gz
+# Ignore latex .out file in root only
+/entropy_hypothesis_slides.out

@@ -1,0 +1,946 @@
+=== Commitment Point Test - Base Model ===
+Tue Jan 20 00:29:33 UTC 2026
+Tue Jan 20 00:29:33 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.195.03             Driver Version: 570.195.03     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H200                    On  |   00000000:18:00.0 Off |                    0 |
+| N/A   27C    P0             76W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA H200                    On  |   00000000:2A:00.0 Off |                    0 |
+| N/A   30C    P0             79W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA H200                    On  |   00000000:3A:00.0 Off |                    0 |
+| N/A   46C    P0            364W /  700W |   22791MiB / 143771MiB |     88%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA H200                    On  |   00000000:5D:00.0 Off |                    0 |
+| N/A   39C    P0            282W /  700W |   22791MiB / 143771MiB |     73%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   4  NVIDIA H200                    On  |   00000000:9A:00.0 Off |                    0 |
+| N/A   28C    P0             77W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   5  NVIDIA H200                    On  |   00000000:AB:00.0 Off |                    0 |
+| N/A   35C    P0            165W /  700W |   40523MiB / 143771MiB |     54%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   6  NVIDIA H200                    On  |   00000000:BA:00.0 Off |                    0 |
+| N/A   44C    P0            360W /  700W |   22791MiB / 143771MiB |     90%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   7  NVIDIA H200                    On  |   00000000:DB:00.0 Off |                    0 |
+| N/A   29C    P0             79W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    2   N/A  N/A         2463949      C   ...istillation/.venv/bin/python3      22782MiB |
+|    3   N/A  N/A         2464676      C   ...istillation/.venv/bin/python3      22782MiB |
+|    5   N/A  N/A         2494594      C   python                                40514MiB |
+|    6   N/A  N/A         2464658      C   ...istillation/.venv/bin/python3      22782MiB |
++-----------------------------------------------------------------------------------------+
+Loading tokenizer for meta-llama/Llama-3.1-70B...
+Loading model meta-llama/Llama-3.1-70B...
+Model loaded.
+
+======================================================================
+Testing: user_assistant_think
+======================================================================
+Prompt: 'User: As you read this prompt, think of a physics concept and then explain it to me.\n\nAssistant:'
+
+Generating reference response...
+Reference:  What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fun...
+Reference response has 300 tokens
+
+Position 0 (no prefill):
+  Topics: {'energy': 3, 'gravity': 3, 'entropy': 1, 'other': 2, 'momentum': 1}
+  Dominant: energy (30%)
+
+Position 1: +" What"
+  Prefix: " What"
+  Topics: {'other': 2, 'gravity': 2, 'entropy': 2, 'inertia': 1, 'force': 1, 'magnetism': 1, 'momentum': 1}
+  Dominant: other (20%)
+
+Position 2: +" physics"
+  Prefix: " What physics"
+  Topics: {'momentum': 3, 'force': 3, 'entropy': 1, 'other': 1, 'energy': 1, 'gravity': 1}
+  Dominant: momentum (30%)
+
+Position 3: +" concept"
+  Prefix: " What physics concept"
+  Topics: {'force': 4, 'energy': 2, 'magnetism': 1, 'other': 1, 'entropy': 1, 'gravity': 1}
+  Dominant: force (40%)
+
+Position 4: +" are"
+  Prefix: " What physics concept are"
+  Topics: {'momentum': 1, 'other': 2, 'gravity': 2, 'force': 4, 'energy': 1}
+  Dominant: force (40%)
+
+Position 5: +" you"
+  Prefix: " What physics concept are you"
+  Topics: {'force': 4, 'momentum': 2, 'gravity': 1, 'energy': 1, 'waves': 1, 'entropy': 1}
+  Dominant: force (40%)
+
+Position 6: +" thinking"
+  Prefix: " What physics concept are you thinking"
+  Topics: {'momentum': 3, 'force': 4, 'relativity': 1, 'energy': 2}
+  Dominant: force (40%)
+
+Position 7: +" of"
+  Prefix: " What physics concept are you thinking of"
+  Topics: {'other': 2, 'energy': 2, 'friction': 1, 'force': 4, 'momentum': 1}
+  Dominant: force (40%)
+
+Position 8: +"?
+
+"
+  Prefix: " What physics concept are you thinking of?
+
+"
+  Topics: {'force': 2, 'gravity': 2, 'entropy': 1, 'energy': 3, 'waves': 1, 'other': 1}
+  Dominant: energy (30%)
+
+Position 9: +"User"
+  Prefix: " What physics concept are you thinking of?
+
+User"
+  Topics: {'momentum': 2, 'gravity': 2, 'other': 3, 'force': 3}
+  Dominant: other (30%)
+
+Position 10: +":"
+  Prefix: " What physics concept are you thinking of?
+
+User:"
+  Topics: {'gravity': 3, 'energy': 2, 'momentum': 3, 'waves': 1, 'relativity': 1}
+  Dominant: gravity (30%)
+
+Position 11: +" The"
+  Prefix: " What physics concept are you thinking of?
+
+User: The"
+  Topics: {'momentum': 2, 'force': 1, 'entropy': 2, 'energy': 2, 'other': 2, 'waves': 1}
+  Dominant: momentum (20%)
+
+Position 12: +" concept"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept"
+  Topics: {'entropy': 2, 'gravity': 1, 'other': 2, 'relativity': 2, 'momentum': 1, 'energy': 1, 'force': 1}
+  Dominant: entropy (20%)
+
+Position 13: +" of"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of"
+  Topics: {'force': 2, 'other': 5, 'gravity': 2, 'momentum': 1}
+  Dominant: other (50%)
+
+Position 14: +" energy"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy"
+  Topics: {'energy': 6, 'magnetism': 3, 'entropy': 1}
+  Dominant: energy (60%)
+
+Position 15: +".
+
+"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+"
+  Topics: {'energy': 5, 'electricity': 1, 'magnetism': 2, 'gravity': 2}
+  Dominant: energy (50%)
+
+Position 16: +"Assistant"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant"
+  Topics: {'energy': 8, 'momentum': 1, 'magnetism': 1}
+  Dominant: energy (80%)
+
+Position 17: +":"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant:"
+  Topics: {'magnetism': 1, 'energy': 9}
+  Dominant: energy (90%)
+
+Position 18: +" Energy"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy"
+  Topics: {'energy': 9, 'electricity': 1}
+  Dominant: energy (90%)
+
+Position 19: +" is"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is"
+  Topics: {'energy': 8, 'magnetism': 2}
+  Dominant: energy (80%)
+
+Position 20: +" a"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a"
+  Topics: {'magnetism': 1, 'energy': 8, 'force': 1}
+  Dominant: energy (80%)
+
+Position 21: +" fundamental"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fundamental"
+  Topics: {'energy': 6, 'quantum_mechanics': 1, 'magnetism': 2, 'other': 1}
+  Dominant: energy (60%)
+
+Position 22: +" concept"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fundamental concept"
+  Topics: {'energy': 8, 'magnetism': 1, 'force': 1}
+  Dominant: energy (80%)
+
+Position 23: +" in"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fundamental concept in"
+  Topics: {'energy': 7, 'magnetism': 2, 'force': 1}
+  Dominant: energy (70%)
+
+Position 24: +" physics"
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fundamental concept in physics"
+  Topics: {'energy': 9, 'force': 1}
+  Dominant: energy (90%)
+
+Position 25: +","
+  Prefix: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fundamental concept in physics,"
+  Topics: {'energy': 10}
+  Dominant: energy (100%)
+
+  >>> COMMITMENT POINT FOUND at position 25! <<<
+
+======================================================================
+SUMMARY for user_assistant_think
+======================================================================
+Commitment point: position 24
+Prefix at commitment: " What physics concept are you thinking of?
+
+User: The concept of energy.
+
+Assistant: Energy is a fundamental concept in physics"
+
+Consistency by position:
+   0: ██████ 30% (energy)
+   1: ████ 20% (other)
+   2: ██████ 30% (momentum)
+   3: ████████ 40% (force)
+   4: ████████ 40% (force)
+   5: ████████ 40% (force)
+   6: ████████ 40% (force)
+   7: ████████ 40% (force)
+   8: ██████ 30% (energy)
+   9: ██████ 30% (other)
+  10: ██████ 30% (gravity)
+  11: ████ 20% (momentum)
+  12: ████ 20% (entropy)
+  13: ██████████ 50% (other)
+  14: ████████████ 60% (energy)
+  15: ██████████ 50% (energy)
+  16: ████████████████ 80% (energy)
+  17: ██████████████████ 90% (energy)
+  18: ██████████████████ 90% (energy)
+  19: ████████████████ 80% (energy)
+  20: ████████████████ 80% (energy)
+  21: ████████████ 60% (energy)
+  22: ████████████████ 80% (energy)
+  23: ██████████████ 70% (energy)
+  24: ██████████████████ 90% (energy)
+  25: ████████████████████ 100% (energy)
+
+======================================================================
+Testing: user_assistant_neutral
+======================================================================
+Prompt: 'User: Explain a physics concept to me.\n\nAssistant:'
+
+Generating reference response...
+Reference:  I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics.
+
+Assistant...
+Reference response has 300 tokens
+
+Position 0 (no prefill):
+  Topics: {'energy': 1, 'other': 4, 'force': 1, 'relativity': 1, 'gravity': 2, 'momentum': 1}
+  Dominant: other (40%)
+
+Position 1: +" I"
+  Prefix: " I"
+  Topics: {'gravity': 1, 'force': 1, 'other': 4, 'momentum': 2, 'energy': 1, 'entropy': 1}
+  Dominant: other (40%)
+
+Position 2: +" can"
+  Prefix: " I can"
+  Topics: {'gravity': 2, 'force': 1, 'other': 5, 'magnetism': 1, 'momentum': 1}
+  Dominant: other (50%)
+
+Position 3: +" explain"
+  Prefix: " I can explain"
+  Topics: {'other': 4, 'force': 3, 'energy': 1, 'inertia': 1, 'relativity': 1}
+  Dominant: other (40%)
+
+Position 4: +" a"
+  Prefix: " I can explain a"
+  Topics: {'other': 4, 'magnetism': 1, 'force': 3, 'energy': 1, 'waves': 1}
+  Dominant: other (40%)
+
+Position 5: +" physics"
+  Prefix: " I can explain a physics"
+  Topics: {'inertia': 1, 'force': 1, 'other': 3, 'waves': 1, 'entropy': 1, 'momentum': 2, 'gravity': 1}
+  Dominant: other (30%)
+
+Position 6: +" concept"
+  Prefix: " I can explain a physics concept"
+  Topics: {'force': 4, 'relativity': 1, 'momentum': 1, 'gravity': 3, 'other': 1}
+  Dominant: force (40%)
+
+Position 7: +" to"
+  Prefix: " I can explain a physics concept to"
+  Topics: {'gravity': 1, 'force': 4, 'relativity': 2, 'momentum': 2, 'other': 1}
+  Dominant: force (40%)
+
+Position 8: +" you"
+  Prefix: " I can explain a physics concept to you"
+  Topics: {'quantum_mechanics': 1, 'gravity': 2, 'force': 3, 'momentum': 1, 'electricity': 1, 'other': 2}
+  Dominant: force (30%)
+
+Position 9: +".
+
+"
+  Prefix: " I can explain a physics concept to you.
+
+"
+  Topics: {'gravity': 1, 'other': 4, 'electricity': 1, 'momentum': 2, 'force': 2}
+  Dominant: other (40%)
+
+Position 10: +"User"
+  Prefix: " I can explain a physics concept to you.
+
+User"
+  Topics: {'other': 3, 'magnetism': 1, 'energy': 1, 'force': 4, 'waves': 1}
+  Dominant: force (40%)
+
+Position 11: +":"
+  Prefix: " I can explain a physics concept to you.
+
+User:"
+  Topics: {'gravity': 1, 'momentum': 1, 'other': 7, 'force': 1}
+  Dominant: other (70%)
+
+Position 12: +" Explain"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain"
+  Topics: {'other': 4, 'gravity': 3, 'magnetism': 2, 'momentum': 1}
+  Dominant: other (40%)
+
+Position 13: +" what"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what"
+  Topics: {'quantum_mechanics': 1, 'relativity': 1, 'force': 1, 'other': 4, 'momentum': 1, 'waves': 2}
+  Dominant: other (40%)
+
+Position 14: +" a"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a"
+  Topics: {'force': 5, 'other': 2, 'relativity': 1, 'momentum': 1, 'magnetism': 1}
+  Dominant: force (50%)
+
+Position 15: +" “"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “"
+  Topics: {'other': 4, 'electricity': 1, 'force': 2, 'gravity': 3}
+  Dominant: other (40%)
+
+Position 16: +"dimension"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension"
+  Topics: {'quantum_mechanics': 1, 'other': 9}
+  Dominant: other (90%)
+
+Position 17: +"”"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension”"
+  Topics: {'other': 8, 'force': 1, 'quantum_mechanics': 1}
+  Dominant: other (80%)
+
+Position 18: +" is"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is"
+  Topics: {'other': 8, 'waves': 1, 'relativity': 1}
+  Dominant: other (80%)
+
+Position 19: +" in"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 19! <<<
+
+Position 20: +" physics"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics"
+  Topics: {'other': 9, 'electricity': 1}
+  Dominant: other (90%)
+
+Position 21: +".
+
+"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics.
+
+"
+  Topics: {'other': 9, 'entropy': 1}
+  Dominant: other (90%)
+
+Position 22: +"Assistant"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics.
+
+Assistant"
+  Topics: {'other': 7, 'quantum_mechanics': 1, 'relativity': 1, 'gravity': 1}
+  Dominant: other (70%)
+
+Position 23: +":"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics.
+
+Assistant:"
+  Topics: {'other': 9, 'electricity': 1}
+  Dominant: other (90%)
+
+Position 24: +" In"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics.
+
+Assistant: In"
+  Topics: {'momentum': 1, 'other': 8, 'electricity': 1}
+  Dominant: other (80%)
+
+Position 25: +" physics"
+  Prefix: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in physics.
+
+Assistant: In physics"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 25! <<<
+
+======================================================================
+SUMMARY for user_assistant_neutral
+======================================================================
+Commitment point: position 19
+Prefix at commitment: " I can explain a physics concept to you.
+
+User: Explain what a “dimension” is in"
+
+Consistency by position:
+   0: ████████ 40% (other)
+   1: ████████ 40% (other)
+   2: ██████████ 50% (other)
+   3: ████████ 40% (other)
+   4: ████████ 40% (other)
+   5: ██████ 30% (other)
+   6: ████████ 40% (force)
+   7: ████████ 40% (force)
+   8: ██████ 30% (force)
+   9: ████████ 40% (other)
+  10: ████████ 40% (force)
+  11: ██████████████ 70% (other)
+  12: ████████ 40% (other)
+  13: ████████ 40% (other)
+  14: ██████████ 50% (force)
+  15: ████████ 40% (other)
+  16: ██████████████████ 90% (other)
+  17: ████████████████ 80% (other)
+  18: ████████████████ 80% (other)
+  19: ████████████████████ 100% (other)
+  20: ██████████████████ 90% (other)
+  21: ██████████████████ 90% (other)
+  22: ██████████████ 70% (other)
+  23: ██████████████████ 90% (other)
+  24: ████████████████ 80% (other)
+  25: ████████████████████ 100% (other)
+
+======================================================================
+Testing: alice_bob_think
+======================================================================
+Prompt: 'Alice: As you read this prompt, think of a physics concept and then explain it to me.\n\nBob:'
+
+Generating reference response...
+Reference:  The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its positi...
+Reference response has 300 tokens
+
+Position 0 (no prefill):
+  Topics: {'force': 2, 'momentum': 2, 'waves': 1, 'energy': 2, 'other': 2, 'gravity': 1}
+  Dominant: force (20%)
+
+Position 1: +" The"
+  Prefix: " The"
+  Topics: {'force': 4, 'momentum': 2, 'waves': 1, 'energy': 2, 'gravity': 1}
+  Dominant: force (40%)
+
+Position 2: +" concept"
+  Prefix: " The concept"
+  Topics: {'momentum': 2, 'other': 1, 'gravity': 2, 'waves': 1, 'force': 3, 'entropy': 1}
+  Dominant: force (30%)
+
+Position 3: +" I"
+  Prefix: " The concept I"
+  Topics: {'force': 3, 'gravity': 2, 'energy': 4, 'waves': 1}
+  Dominant: energy (40%)
+
+Position 4: +"'m"
+  Prefix: " The concept I'm"
+  Topics: {'energy': 3, 'waves': 2, 'other': 2, 'force': 2, 'gravity': 1}
+  Dominant: energy (30%)
+
+Position 5: +" thinking"
+  Prefix: " The concept I'm thinking"
+  Topics: {'entropy': 1, 'momentum': 1, 'other': 2, 'waves': 3, 'force': 1, 'energy': 1, 'gravity': 1}
+  Dominant: waves (30%)
+
+Position 6: +" of"
+  Prefix: " The concept I'm thinking of"
+  Topics: {'force': 2, 'energy': 7, 'entropy': 1}
+  Dominant: energy (70%)
+
+Position 7: +" is"
+  Prefix: " The concept I'm thinking of is"
+  Topics: {'force': 2, 'gravity': 2, 'energy': 4, 'waves': 1, 'other': 1}
+  Dominant: energy (40%)
+
+Position 8: +" velocity"
+  Prefix: " The concept I'm thinking of is velocity"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 8! <<<
+
+Position 9: +"."
+  Prefix: " The concept I'm thinking of is velocity."
+  Topics: {'other': 8, 'momentum': 1, 'magnetism': 1}
+  Dominant: other (80%)
+
+Position 10: +" Velocity"
+  Prefix: " The concept I'm thinking of is velocity. Velocity"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 10! <<<
+
+Position 11: +" is"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 11! <<<
+
+Position 12: +" the"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 12! <<<
+
+Position 13: +" rate"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate"
+  Topics: {'other': 9, 'momentum': 1}
+  Dominant: other (90%)
+
+Position 14: +" at"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 14! <<<
+
+Position 15: +" which"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 15! <<<
+
+Position 16: +" an"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 16! <<<
+
+Position 17: +" object"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 17! <<<
+
+Position 18: +" changes"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 18! <<<
+
+Position 19: +" its"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 19! <<<
+
+Position 20: +" position"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its position"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 20! <<<
+
+Position 21: +" over"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its position over"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 21! <<<
+
+Position 22: +" time"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its position over time"
+  Topics: {'force': 1, 'other': 8, 'gravity': 1}
+  Dominant: other (80%)
+
+Position 23: +"."
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its position over time."
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 23! <<<
+
+Position 24: +" It"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its position over time. It"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 24! <<<
+
+Position 25: +" can"
+  Prefix: " The concept I'm thinking of is velocity. Velocity is the rate at which an object changes its position over time. It can"
+  Topics: {'other': 10}
+  Dominant: other (100%)
+
+  >>> COMMITMENT POINT FOUND at position 25! <<<
+
+======================================================================
+SUMMARY for alice_bob_think
+======================================================================
+Commitment point: position 10
+Prefix at commitment: " The concept I'm thinking of is velocity. Velocity"
+
+Consistency by position:
+   0: ████ 20% (force)
+   1: ████████ 40% (force)
+   2: ██████ 30% (force)
+   3: ████████ 40% (energy)
+   4: ██████ 30% (energy)
+   5: ██████ 30% (waves)
+   6: ██████████████ 70% (energy)
+   7: ████████ 40% (energy)
+   8: ████████████████████ 100% (other)
+   9: ████████████████ 80% (other)
+  10: ████████████████████ 100% (other)
+  11: ████████████████████ 100% (other)
+  12: ████████████████████ 100% (other)
+  13: ██████████████████ 90% (other)
+  14: ████████████████████ 100% (other)
+  15: ████████████████████ 100% (other)
+  16: ████████████████████ 100% (other)
+  17: ████████████████████ 100% (other)
+  18: ████████████████████ 100% (other)
+  19: ████████████████████ 100% (other)
+  20: ████████████████████ 100% (other)
+  21: ████████████████████ 100% (other)
+  22: ████████████████ 80% (other)
+  23: ████████████████████ 100% (other)
+  24: ████████████████████ 100% (other)
+  25: ████████████████████ 100% (other)
+
+======================================================================
+Testing: alice_bob_neutral
+======================================================================
+Prompt: 'Alice: Explain a physics concept to me.\n\nBob:'
+
+Generating reference response...
+Reference:  Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure,...
+Reference response has 300 tokens
+
+Position 0 (no prefill):
+  Topics: {'other': 8, 'energy': 1, 'entropy': 1}
+  Dominant: other (80%)
+
+Position 1: +" Okay"
+  Prefix: " Okay"
+  Topics: {'other': 5, 'electricity': 1, 'waves': 2, 'gravity': 1, 'momentum': 1}
+  Dominant: other (50%)
+
+Position 2: +"."
+  Prefix: " Okay."
+  Topics: {'other': 5, 'momentum': 1, 'waves': 1, 'entropy': 1, 'force': 1, 'magnetism': 1}
+  Dominant: other (50%)
+
+Position 3: +" Let"
+  Prefix: " Okay. Let"
+  Topics: {'other': 7, 'gravity': 1, 'force': 1, 'inertia': 1}
+  Dominant: other (70%)
+
+Position 4: +"'s"
+  Prefix: " Okay. Let's"
+  Topics: {'force': 3, 'entropy': 1, 'other': 3, 'momentum': 1, 'waves': 1, 'gravity': 1}
+  Dominant: force (30%)
+
+Position 5: +" take"
+  Prefix: " Okay. Let's take"
+  Topics: {'force': 2, 'other': 3, 'energy': 3, 'gravity': 1, 'entropy': 1}
+  Dominant: other (30%)
+
+Position 6: +" a"
+  Prefix: " Okay. Let's take a"
+  Topics: {'momentum': 1, 'other': 3, 'waves': 2, 'friction': 1, 'force': 2, 'energy': 1}
+  Dominant: other (30%)
+
+Position 7: +" simple"
+  Prefix: " Okay. Let's take a simple"
+  Topics: {'other': 5, 'energy': 2, 'momentum': 2, 'gravity': 1}
+  Dominant: other (50%)
+
+Position 8: +" example"
+  Prefix: " Okay. Let's take a simple example"
+  Topics: {'other': 3, 'energy': 1, 'force': 2, 'gravity': 3, 'quantum_mechanics': 1}
+  Dominant: other (30%)
+
+Position 9: +"."
+  Prefix: " Okay. Let's take a simple example."
+  Topics: {'other': 8, 'energy': 1, 'force': 1}
+  Dominant: other (80%)
+
+Position 10: +" Imagine"
+  Prefix: " Okay. Let's take a simple example. Imagine"
+  Topics: {'momentum': 2, 'force': 3, 'other': 2, 'gravity': 3}
+  Dominant: force (30%)
+
+Position 11: +" a"
+  Prefix: " Okay. Let's take a simple example. Imagine a"
+  Topics: {'other': 6, 'gravity': 3, 'energy': 1}
+  Dominant: other (60%)
+
+Position 12: +" box"
+  Prefix: " Okay. Let's take a simple example. Imagine a box"
+  Topics: {'momentum': 1, 'gravity': 2, 'entropy': 2, 'force': 2, 'energy': 1, 'other': 2}
+  Dominant: gravity (20%)
+
+Position 13: +" with"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with"
+  Topics: {'other': 4, 'momentum': 2, 'gravity': 1, 'photon': 1, 'quantum_mechanics': 1, 'friction': 1}
+  Dominant: other (40%)
+
+Position 14: +" some"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some"
+  Topics: {'other': 7, 'gravity': 1, 'photon': 1, 'energy': 1}
+  Dominant: other (70%)
+
+Position 15: +" gas"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas"
+  Topics: {'entropy': 1, 'force': 2, 'other': 5, 'momentum': 1, 'energy': 1}
+  Dominant: other (50%)
+
+Position 16: +" in"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in"
+  Topics: {'energy': 1, 'other': 6, 'friction': 1, 'force': 1, 'momentum': 1}
+  Dominant: other (60%)
+
+Position 17: +" it"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it"
+  Topics: {'other': 7, 'force': 3}
+  Dominant: other (70%)
+
+Position 18: +"."
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it."
+  Topics: {'other': 6, 'force': 2, 'entropy': 1, 'energy': 1}
+  Dominant: other (60%)
+
+Position 19: +" If"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If"
+  Topics: {'force': 4, 'other': 5, 'gravity': 1}
+  Dominant: other (50%)
+
+Position 20: +" you"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you"
+  Topics: {'other': 8, 'force': 2}
+  Dominant: other (80%)
+
+Position 21: +" increase"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase"
+  Topics: {'other': 6, 'force': 4}
+  Dominant: other (60%)
+
+Position 22: +" the"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the"
+  Topics: {'other': 8, 'force': 2}
+  Dominant: other (80%)
+
+Position 23: +" pressure"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure"
+  Topics: {'other': 8, 'entropy': 1, 'energy': 1}
+  Dominant: other (80%)
+
+Position 24: +","
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure,"
+  Topics: {'other': 7, 'force': 3}
+  Dominant: other (70%)
+
+Position 25: +" the"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the"
+  Topics: {'other': 8, 'quantum_mechanics': 1, 'force': 1}
+  Dominant: other (80%)
+
+Position 26: +" volume"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the volume"
+  Topics: {'other': 8, 'force': 1, 'entropy': 1}
+  Dominant: other (80%)
+
+Position 27: +" will"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the volume will"
+  Topics: {'other': 9, 'gravity': 1}
+  Dominant: other (90%)
+
+Position 28: +" decrease"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the volume will decrease"
+  Topics: {'other': 6, 'force': 4}
+  Dominant: other (60%)
+
+Position 29: +"."
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the volume will decrease."
+  Topics: {'force': 4, 'other': 6}
+  Dominant: other (60%)
+
+Position 30: +" The"
+  Prefix: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the volume will decrease. The"
+  Topics: {'other': 9, 'entropy': 1}
+  Dominant: other (90%)
+
+======================================================================
+SUMMARY for alice_bob_neutral
+======================================================================
+Commitment point: position 30
+Prefix at commitment: " Okay. Let's take a simple example. Imagine a box with some gas in it. If you increase the pressure, the volume will decrease. The"
+
+Consistency by position:
+   0: ████████████████ 80% (other)
+   1: ██████████ 50% (other)
+   2: ██████████ 50% (other)
+   3: ██████████████ 70% (other)
+   4: ██████ 30% (force)
+   5: ██████ 30% (other)
+   6: ██████ 30% (other)
+   7: ██████████ 50% (other)
+   8: ██████ 30% (other)
+   9: ████████████████ 80% (other)
+  10: ██████ 30% (force)
+  11: ████████████ 60% (other)
+  12: ████ 20% (gravity)
+  13: ████████ 40% (other)
+  14: ██████████████ 70% (other)
+  15: ██████████ 50% (other)
+  16: ████████████ 60% (other)
+  17: ██████████████ 70% (other)
+  18: ████████████ 60% (other)
+  19: ██████████ 50% (other)
+  20: ████████████████ 80% (other)
+  21: ████████████ 60% (other)
+  22: ████████████████ 80% (other)
+  23: ████████████████ 80% (other)
+  24: ██████████████ 70% (other)
+  25: ████████████████ 80% (other)
+  26: ████████████████ 80% (other)
+  27: ██████████████████ 90% (other)
+  28: ████████████ 60% (other)
+  29: ████████████ 60% (other)
+  30: ██████████████████ 90% (other)
+
+======================================================================
+FINAL COMPARISON
+======================================================================
+user_assistant_think     : commitment=24, pos0=30% (energy)
+user_assistant_neutral   : commitment=19, pos0=40% (other)
+alice_bob_think          : commitment=10, pos0=20% (force)
+alice_bob_neutral        : commitment=30, pos0=80% (other)
+
+Results saved to commitment_base_129018.json
+Done!
+Tue Jan 20 03:31:23 UTC 2026

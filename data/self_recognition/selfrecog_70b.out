@@ -1,0 +1,132 @@
+=== Self-Recognition Steering - Untruncated (Both Prompts) ===
+Fri Jan 16 11:09:02 UTC 2026
+Fri Jan 16 11:09:02 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.195.03             Driver Version: 570.195.03     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H200                    On  |   00000000:18:00.0 Off |                    0 |
+| N/A   27C    P0             78W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA H200                    On  |   00000000:2A:00.0 Off |                    0 |
+| N/A   29C    P0             79W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA H200                    On  |   00000000:3A:00.0 Off |                    0 |
+| N/A   30C    P0             78W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA H200                    On  |   00000000:5D:00.0 Off |                    0 |
+| N/A   27C    P0             76W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   4  NVIDIA H200                    On  |   00000000:9A:00.0 Off |                    0 |
+| N/A   30C    P0             78W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   5  NVIDIA H200                    On  |   00000000:AB:00.0 Off |                    0 |
+| N/A   32C    P0            119W /  700W |  136763MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   6  NVIDIA H200                    On  |   00000000:BA:00.0 Off |                    0 |
+| N/A   30C    P0             78W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   7  NVIDIA H200                    On  |   00000000:DB:00.0 Off |                    0 |
+| N/A   28C    P0             78W /  700W |       4MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    5   N/A  N/A           12766      C   ...ew_training/.venv/bin/python3      13634... |
++-----------------------------------------------------------------------------------------+
+======================================================================
+SELF-RECOGNITION WITH ENTROPY STEERING - UNTRUNCATED
+Testing both 'Someone else' and 'Human' prompt formats
+======================================================================
+
+Loading entropy directions...
+Loaded directions for 80 layers
+
+Loading model: meta-llama/Llama-3.1-70B-Instruct
+Model loaded!
+
+Loading summaries (untruncated)...
+Loaded 50 model summaries, 50 human summaries
+
+======================================================================
+PROMPT FORMAT: SOMEONE_ELSE
+Other token: 'Someone'
+======================================================================
+
+--- BASELINE (no steering) ---
+Accuracy: 94/100 = 94.0%
+  Self (expect Me): 96.0%
+  Other (expect Someone): 92.0%
+Self-detection rate: 52.0%
+Confidence: 0.878
+
+--- EARLY LAYER STEERING (0-27) ---
+[mag=-3.0] Acc: 50.0% | Self: 100% | Other: 0% | SelfDetect: 100%
+[mag=-2.0] Acc: 89.0% | Self: 98% | Other: 80% | SelfDetect: 59%
+[mag=-1.0] Acc: 93.0% | Self: 98% | Other: 88% | SelfDetect: 55%
+[mag=+1.0] Acc: 94.0% | Self: 96% | Other: 92% | SelfDetect: 52%
+[mag=+2.0] Acc: 96.0% | Self: 100% | Other: 92% | SelfDetect: 54%
+[mag=+3.0] Acc: 94.0% | Self: 96% | Other: 92% | SelfDetect: 52%
+
+======================================================================
+PROMPT FORMAT: HUMAN
+Other token: 'Human'
+======================================================================
+
+--- BASELINE (no steering) ---
+Accuracy: 31/100 = 31.0%
+  Self (expect Me): 18.0%
+  Other (expect Human): 44.0%
+Self-detection rate: 37.0%
+Confidence: 0.708
+
+--- EARLY LAYER STEERING (0-27) ---
+[mag=-3.0] Acc: 50.0% | Self: 100% | Other: 0% | SelfDetect: 100%
+[mag=-2.0] Acc: 52.0% | Self: 86% | Other: 18% | SelfDetect: 84%
+[mag=-1.0] Acc: 42.0% | Self: 60% | Other: 24% | SelfDetect: 68%
+[mag=+1.0] Acc: 39.0% | Self: 4% | Other: 74% | SelfDetect: 15%
+[mag=+2.0] Acc: 45.0% | Self: 2% | Other: 88% | SelfDetect: 7%
+[mag=+3.0] Acc: 50.0% | Self: 2% | Other: 98% | SelfDetect: 2%
+
+==========================================================================================
+SUMMARY: Untruncated Self-Recognition by Prompt Format and Steering
+==========================================================================================
+Condition                      | Accuracy | SelfDetect |   Self |  Other |   Conf
+------------------------------------------------------------------------------------------
+human_baseline                 |    31.0% |      37.0% |    18% |    44% |  0.708
+human_early_mag-1.0            |    42.0% |      68.0% |    60% |    24% |  0.705
+human_early_mag-2.0            |    52.0% |      84.0% |    86% |    18% |  0.792
+human_early_mag-3.0            |    50.0% |     100.0% |   100% |     0% |  0.992
+human_early_mag1.0             |    39.0% |      15.0% |     4% |    74% |  0.809
+human_early_mag2.0             |    45.0% |       7.0% |     2% |    88% |  0.871
+human_early_mag3.0             |    50.0% |       2.0% |     2% |    98% |  0.924
+someone_else_baseline          |    94.0% |      52.0% |    96% |    92% |  0.878
+someone_else_early_mag-1.0     |    93.0% |      55.0% |    98% |    88% |  0.862
+someone_else_early_mag-2.0     |    89.0% |      59.0% |    98% |    80% |  0.808
+someone_else_early_mag-3.0     |    50.0% |     100.0% |   100% |     0% |  0.918
+someone_else_early_mag1.0      |    94.0% |      52.0% |    96% |    92% |  0.878
+someone_else_early_mag2.0      |    96.0% |      54.0% |   100% |    92% |  0.871
+someone_else_early_mag3.0      |    94.0% |      52.0% |    96% |    92% |  0.779
+
+Results saved to /workspace-vast/asving/surprise-experiment/llama70b/results/selfrecognition_steering/selfrecognition_untruncated_results.json
+
+======================================================================
+DONE!
+======================================================================
+
+Done!
+Fri Jan 16 11:11:59 UTC 2026

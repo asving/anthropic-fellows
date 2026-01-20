@@ -1,0 +1,300 @@
+=== Commitment Point Test ===
+Mon Jan 19 19:37:54 UTC 2026
+Mon Jan 19 19:37:54 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.195.03             Driver Version: 570.195.03     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H200                    On  |   00000000:18:00.0 Off |                    0 |
+| N/A   27C    P0             77W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA H200                    On  |   00000000:2A:00.0 Off |                    0 |
+| N/A   28C    P0             78W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA H200                    On  |   00000000:3A:00.0 Off |                    0 |
+| N/A   38C    P0            123W /  700W |    3835MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA H200                    On  |   00000000:5D:00.0 Off |                    0 |
+| N/A   61C    P0            686W /  700W |  123753MiB / 143771MiB |     99%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   4  NVIDIA H200                    On  |   00000000:9A:00.0 Off |                    0 |
+| N/A   37C    P0            263W /  700W |  132763MiB / 143771MiB |     82%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   5  NVIDIA H200                    On  |   00000000:AB:00.0 Off |                    0 |
+| N/A   33C    P0             76W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   6  NVIDIA H200                    On  |   00000000:BA:00.0 Off |                    0 |
+| N/A   31C    P0            118W /  700W |  135881MiB / 143771MiB |    100%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   7  NVIDIA H200                    On  |   00000000:DB:00.0 Off |                    0 |
+| N/A   26C    P0             78W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    2   N/A  N/A         2308107      C   VLLM::EngineCore                       3826MiB |
+|    3   N/A  N/A         1474210      C   python                                12374... |
+|    4   N/A  N/A         1607012      C   .../envs/reward_hack/bin/python3      13275... |
+|    6   N/A  N/A         1607013      C   .../envs/reward_hack/bin/python3      13587... |
++-----------------------------------------------------------------------------------------+
+Loading tokenizer for meta-llama/Llama-3.1-70B-Instruct...
+Loading model meta-llama/Llama-3.1-70B-Instruct...
+Model loaded.
+
+======================================================================
+COMMITMENT POINT TEST
+======================================================================
+User prompt: "Explain a physics concept to me."
+Completions per position: 10
+Max prefix tokens to test: 30
+
+Generating reference response...
+Reference: Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is a phenomenon in whi...
+Reference response has 279 tokens
+
+======================================================================
+Testing commitment at each token position
+======================================================================
+
+Position 0 (no prefill):
+  Topics: {'force': 3, 'momentum': 6, 'quantum_entanglement': 1}
+  Dominant: momentum (60%)
+
+Position 1: +"Let"
+  Prefix: "Let"
+  Topics: {'momentum': 7, 'quantum_entanglement': 2, 'force': 1}
+  Dominant: momentum (70%)
+
+Position 2: +"'s"
+  Prefix: "Let's"
+  Topics: {'momentum': 7, 'quantum_entanglement': 1, 'force': 1, 'relativity': 1}
+  Dominant: momentum (70%)
+
+Position 3: +" talk"
+  Prefix: "Let's talk"
+  Topics: {'quantum_entanglement': 2, 'momentum': 8}
+  Dominant: momentum (80%)
+
+Position 4: +" about"
+  Prefix: "Let's talk about"
+  Topics: {'force': 2, 'momentum': 7, 'quantum_entanglement': 1}
+  Dominant: momentum (70%)
+
+Position 5: +" the"
+  Prefix: "Let's talk about the"
+  Topics: {'force': 2, 'momentum': 6, 'quantum_entanglement': 1, 'other': 1}
+  Dominant: momentum (60%)
+
+Position 6: +" concept"
+  Prefix: "Let's talk about the concept"
+  Topics: {'momentum': 5, 'quantum_mechanics': 1, 'force': 1, 'quantum_entanglement': 3}
+  Dominant: momentum (50%)
+
+Position 7: +" of"
+  Prefix: "Let's talk about the concept of"
+  Topics: {'momentum': 8, 'force': 1, 'quantum_mechanics': 1}
+  Dominant: momentum (80%)
+
+Position 8: +" ""
+  Prefix: "Let's talk about the concept of ""
+  Topics: {'momentum': 7, 'other': 2, 'force': 1}
+  Dominant: momentum (70%)
+
+Position 9: +"Quant"
+  Prefix: "Let's talk about the concept of "Quant"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 9! <<<
+
+Position 10: +"um"
+  Prefix: "Let's talk about the concept of "Quantum"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 10! <<<
+
+Position 11: +" Ent"
+  Prefix: "Let's talk about the concept of "Quantum Ent"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 11! <<<
+
+Position 12: +"ang"
+  Prefix: "Let's talk about the concept of "Quantum Entang"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 12! <<<
+
+Position 13: +"lement"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 13! <<<
+
+Position 14: +"."
+
+"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 14! <<<
+
+Position 15: +"Quant"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quant"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 15! <<<
+
+Position 16: +"um"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 16! <<<
+
+Position 17: +" Ent"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Ent"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 17! <<<
+
+Position 18: +"ang"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entang"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 18! <<<
+
+Position 19: +"lement"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 19! <<<
+
+Position 20: +" is"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 20! <<<
+
+Position 21: +" a"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is a"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 21! <<<
+
+Position 22: +" phenomenon"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is a phenomenon"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 22! <<<
+
+Position 23: +" in"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is a phenomenon in"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 23! <<<
+
+Position 24: +" which"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is a phenomenon in which"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 24! <<<
+
+Position 25: +" two"
+  Prefix: "Let's talk about the concept of "Quantum Entanglement."
+
+Quantum Entanglement is a phenomenon in which two"
+  Topics: {'quantum_entanglement': 10}
+  Dominant: quantum_entanglement (100%)
+
+  >>> COMMITMENT POINT FOUND at position 25! <<<
+
+======================================================================
+SUMMARY
+======================================================================
+Commitment point: position 9
+Prefix at commitment: "Let's talk about the concept of "Quant"
+
+Consistency by position:
+   0: ████████████ 60% (momentum)
+   1: ██████████████ 70% (momentum)
+   2: ██████████████ 70% (momentum)
+   3: ████████████████ 80% (momentum)
+   4: ██████████████ 70% (momentum)
+   5: ████████████ 60% (momentum)
+   6: ██████████ 50% (momentum)
+   7: ████████████████ 80% (momentum)
+   8: ██████████████ 70% (momentum)
+   9: ████████████████████ 100% (quantum_entanglement)
+  10: ████████████████████ 100% (quantum_entanglement)
+  11: ████████████████████ 100% (quantum_entanglement)
+  12: ████████████████████ 100% (quantum_entanglement)
+  13: ████████████████████ 100% (quantum_entanglement)
+  14: ████████████████████ 100% (quantum_entanglement)
+  15: ████████████████████ 100% (quantum_entanglement)
+  16: ████████████████████ 100% (quantum_entanglement)
+  17: ████████████████████ 100% (quantum_entanglement)
+  18: ████████████████████ 100% (quantum_entanglement)
+  19: ████████████████████ 100% (quantum_entanglement)
+  20: ████████████████████ 100% (quantum_entanglement)
+  21: ████████████████████ 100% (quantum_entanglement)
+  22: ████████████████████ 100% (quantum_entanglement)
+  23: ████████████████████ 100% (quantum_entanglement)
+  24: ████████████████████ 100% (quantum_entanglement)
+  25: ████████████████████ 100% (quantum_entanglement)
+
+Results saved to commitment_point_128368.json
+Done!
+Mon Jan 19 20:23:05 UTC 2026
