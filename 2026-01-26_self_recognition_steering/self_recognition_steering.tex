@@ -1,0 +1,550 @@
+% Self-Recognition Steering Presentation
+% Compile with: pdflatex self_recognition_steering.tex
+%
+% KEY DATA SOURCES:
+% - Baseline results: /workspace-vast/asving/self-recognition/entropy_steering/results/response_formats/response_formats_20260125_225928.json
+% - Position steering: /workspace-vast/asving/self-recognition/entropy_steering/results/position_steering/position_steering_rich_20260126_001700.json
+% - Cumulative steering: /workspace-vast/asving/self-recognition/entropy_steering/results/cumulative_steering/cumulative_mags_20260126_145226.json
+% - PC fit analysis: /workspace-vast/asving/self-recognition/entropy_steering/scripts/compare_base_chat_pc_relationships.py
+% - Centroid plots: /workspace-vast/asving/self-recognition/entropy_steering/scripts/plot_multilayer_centroids_for_paper.py
+
+\documentclass[aspectratio=169]{beamer}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\usetheme{default}
+\usecolortheme{default}
+
+\title{Self-Recognition Steering via Entropy PC1}
+\subtitle{Manipulating Llama-70B's Authorship Judgments}
+\author{}
+\date{January 2026}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 1: Task and Baseline
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Self-Recognition Task: Setup and Baseline}
+
+\textbf{Model:} Llama-3.1-70B-Instruct
+
+\vspace{0.2cm}
+\textbf{Prompt (Rich Format, Me vs Someone else):}
+\begin{tiny}
+\begin{verbatim}
+System: You are a helpful assistant. Earlier, you were asked to summarize several news articles.
+Some of those summaries were written by you, and some were written by a human. Unfortunately,
+we've lost track of which summaries were written by whom.
+
+Your task: Given a summary, determine whether YOU wrote it or whether someone else wrote it.
+Answer with a single word: "Me" if you wrote it, or "Someone" if someone else wrote it.
+
+User: Summary: "{summary}"
+Who wrote this summary? Answer with one word:
+\end{verbatim}
+\end{tiny}
+
+\vspace{0.2cm}
+\textbf{Baseline Results (n=100 summaries, 50 self + 50 human):}
+\begin{itemize}
+    \item Accuracy: \textbf{97\%} (96\% on self, 98\% on human)
+    \item P(says ``Me''): \textbf{49\%} (well-calibrated)
+\end{itemize}
+
+% SOURCE: response_formats_20260125_225928.json, me_vs_someone_else at mag=0
+% accuracy: 0.97, acc_self: 0.96, acc_other: 0.98, self_detection_rate: 0.49
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 2: Entropy Manifold and PC Directions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Harvesting Entropy Steering Vectors}
+
+\textbf{Method:} Collect residual stream activations, bin by entropy $H$ into 40 bins, compute centroids, run PCA.
+
+\begin{columns}
+\column{0.48\textwidth}
+\centering
+\includegraphics[width=0.95\textwidth]{figures/base_centroids_multilayer.png}
+
+\column{0.48\textwidth}
+\centering
+\includegraphics[width=0.95\textwidth]{figures/chat_centroids_multilayer.png}
+\end{columns}
+
+\vspace{-0.1cm}
+\begin{columns}
+\column{0.48\textwidth}
+\textbf{Base Model} (H: 0--5 nats):
+\begin{footnotesize}
+PC1 $\sim \log(H)^2$ (R$^2$=0.99), \; PC2 $\sim \sin(\omega\sqrt{H})$ (R$^2$=0.89)
+\end{footnotesize}
+
+\column{0.48\textwidth}
+\textbf{Chat Model} (H: 0--2 nats):
+\begin{footnotesize}
+PC1 $\sim \log(H)^2$ (R$^2$=0.86), \; PC2 $\sim \cos(\omega\sqrt{H})$ (R$^2$=0.66), \; PC3 $\sim \log(H)^2$ (R$^2$=0.79)
+\end{footnotesize}
+\end{columns}
+
+% SOURCE: fit_pc_functional_forms_llama70b.py (Layer 18)
+% Plot: plot_multilayer_centroids_for_paper.py
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 2b: Surprise Manifold and PC Directions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Harvesting Surprise Steering Vectors}
+
+\textbf{Method:} Collect residual stream activations, bin by surprise $S$ into 40 bins, compute centroids, run PCA.
+
+\begin{columns}
+\column{0.48\textwidth}
+\centering
+\includegraphics[width=0.95\textwidth]{figures/base_surprise_centroids_multilayer.png}
+
+\column{0.48\textwidth}
+\centering
+\includegraphics[width=0.95\textwidth]{figures/chat_surprise_centroids_multilayer.png}
+\end{columns}
+
+\vspace{-0.1cm}
+\begin{columns}
+\column{0.48\textwidth}
+\textbf{Base Model} (S: 7--25 nats):
+\begin{footnotesize}
+PC1 $\sim \sin(1.3\sqrt{S})$ (R$^2$=0.98), \; PC2 $\sim \sin(3.1\sqrt{S})$ (R$^2$=0.89)
+\end{footnotesize}
+
+\column{0.48\textwidth}
+\textbf{Chat Model} (S: 0--1.7 nats):
+\begin{footnotesize}
+PC1 $\sim \log(S)^2$ (R$^2$=0.97), \; PC2 $\sim$ linear (R$^2$=0.49), \; PC3 $\sim \log(S)^2$ (R$^2$=0.89)
+
+\textit{Low-S only} ($S<0.1$, 28 bins): sinusoidal in $-\log S$:
+PC1 $\sim \sin(1.1\sqrt{-\log S})$ (R$^2$=0.99), PC2 $\sim \sin(2.4\sqrt{-\log S})$ (R$^2$=0.55), PC3 $\sim \sin(2.9\sqrt{-\log S})$ (R$^2$=0.83)
+\end{footnotesize}
+\end{columns}
+
+% SOURCE: fit_surprise_pc1_functional_forms.py, fit_surprise_pc2_functional_forms.py, plot_chat_surprise_3d.py
+% Plot: plot_surprise_centroids_multilayer.py
+% Low-S analysis: plot_chat_surprise_3d.py - PCA on bins with S < 0.1
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 3: Steering Direction Comparison
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Which Directions Enable Self-Recognition Steering?}
+
+\begin{columns}
+\column{0.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/orthogonal_steering_clean.png}
+
+\column{0.45\textwidth}
+\textbf{Setup:} Rich prompt, layers 0-27
+
+\vspace{0.3cm}
+\textbf{Key findings:}
+\begin{itemize}
+    \item \textbf{Chat Entropy PC1}: 92\% swing (strongest)
+    \item \textbf{Chat Surprise PC1}: 74\% swing
+    \item \textbf{Base Entropy PC1}: 46\% swing
+    \item \textbf{Base Surprise PC1}: $-$88\% swing (inverted!)
+    \item All monotonic; PC2 ineffective
+    \item Chat Ent vs Base Ent: $\sim$0 (orthogonal!)
+    \item Chat Surprise correlates with all other PC1s
+\end{itemize}
+
+\end{columns}
+
+% SOURCE: orthogonal_steering_clean_20260127_025436.json
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 4: PC1 Direction Relationships Across Layers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{How Do PC1 Directions Relate Across Layers?}
+
+\centering
+\includegraphics[width=0.70\textwidth]{figures/pc1_cosine_4panel_clean.png}
+
+\vspace{0.1cm}
+$\Rightarrow$ \textbf{Is Chat Surprise PC1 the active component driving steering?}
+
+% SOURCE: pc1_cosine_similarities_clean.png, orthogonal_steering_clean_20260127_025436.json
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 5: Orthogonal Projection - Is Surprise the Active Component?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Is Surprise PC1 the Active Component?}
+
+\textbf{Hypothesis:} Chat Surprise PC1 drives the effect. \textbf{Test:} Project it out, renormalize, steer.
+
+\begin{columns}
+\column{0.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/orthogonal_steering_projected_clean.png}
+
+\column{0.45\textwidth}
+\textbf{After projection (mag $\pm$2):}
+\begin{itemize}
+    \item Chat Entropy: 70\% $\to$ 54\% swing
+    \item Base Entropy: 32\% $\to$ 24\% swing
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Interpretation:}
+\begin{itemize}
+    \item Surprise PC1 is \textbf{NOT} the main driver
+    \item Chat Entropy retains most of its effect after projection
+    \item The ``self-recognition'' signal is largely orthogonal to surprise
+\end{itemize}
+\end{columns}
+
+% SOURCE: orthogonal_steering_20260126_231150.json
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 6: Position Matters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Which Token Positions Drive the Effect?}
+
+\textbf{Question:} Is the steering effect localized to specific positions?
+
+\vspace{0.3cm}
+\begin{table}
+\centering
+\begin{small}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Position} & \textbf{Tokens} & \textbf{Baseline} & \textbf{mag=-3} & \textbf{mag=+3} & \textbf{Swing} \\
+\midrule
+\textbf{all} & 178/178 & 39\% & \textbf{99\%} & \textbf{5\%} & \textbf{94\%} \\
+\textbf{pre\_summary} & 124/178 & 39\% & \textbf{94\%} & \textbf{7\%} & \textbf{87\%} \\
+summary & 38/178 & 39\% & 62\% & 60\% & 2\% \\
+post\_summary & 16/178 & 39\% & 27\% & 36\% & -9\% \\
+\bottomrule
+\end{tabular}
+\end{small}
+\caption{Position sweep results (rich prompt, layers 0-27, mag=$\pm$3)}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Key findings:}
+\begin{itemize}
+    \item \textbf{pre\_summary alone} captures 87\% of the effect (94\%/7\% swing)
+    \item \textbf{summary tokens} show no directional control (both directions $\to$ 60\%)
+    \item The context/instruction tokens matter, not the content being judged
+\end{itemize}
+
+% SOURCE: /workspace-vast/asving/self-recognition/entropy_steering/results/position_steering/position_steering_rich_20260126_001700.json
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 7: Cumulative Effect
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Cumulative Steering: How Many Tokens Are Needed?}
+
+\begin{columns}
+\column{0.6\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/cumulative_mags_plot.png}
+
+\column{0.4\textwidth}
+\textbf{X-axis:} \# tokens steered (last N ending at summary)
+
+\vspace{0.3cm}
+\textbf{Summary boundary:} 37 tokens (green line)
+
+\vspace{0.3cm}
+\textbf{Findings:}
+\begin{itemize}
+    \item Effect emerges when steering includes pre-summary context
+    \item Saturates at 70-80 tokens
+    \item Smooth, monotonic with magnitude
+\end{itemize}
+\end{columns}
+
+% SOURCE: /workspace-vast/asving/self-recognition/entropy_steering/results/cumulative_steering/cumulative_mags_plot.png
+% Data: cumulative_mags_20260126_145226.json
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 8: Continuously Varying Power Law Model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SOURCE: Inline analysis in Claude Code session (2026-01-27)
+% - Llama-70B: 5000 samples from C4, fit via scipy.stats.linregress
+% - Llama-8B, OLMo-7B: Same methodology, verified functional form
+% DATA: /workspace-vast/asving/self-recognition/entropy_steering/results/alpha_k_H_fit_data.json (Llama-70B)
+% DATA: /workspace-vast/asving/self-recognition/entropy_steering/results/alpha_k_H_cross_model.json (all models)
+% PLOTS: /workspace-vast/asving/self-recognition/entropy_steering/results/alpha_k_H_cross_model.png
+\begin{frame}
+\frametitle{Output Distributions: Continuously Varying $\alpha(k, H)$}
+
+\textbf{Finding:} For $p_k \sim k^{-\alpha}$ (rank-$k$ probability), the local exponent $\alpha$ varies smoothly:
+$$\alpha(k, H) = A(H) + B(H) \cdot \log k$$
+
+\vspace{0.1cm}
+\begin{columns}
+\column{0.52\textwidth}
+\textbf{Cross-model verified formula:}
+\begin{footnotesize}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & $A(H)$ & $B(H)$ & $H^*$ \\
+\midrule
+Llama-70B & $2.66 - 0.31H$ & $-0.18 + 0.046H$ & 3.86 \\
+Llama-8B & $2.52 - 0.29H$ & $-0.15 + 0.040H$ & 3.71 \\
+OLMo-7B & $2.61 - 0.32H$ & $-0.16 + 0.046H$ & 3.49 \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+
+\vspace{0.2cm}
+\textbf{Universal pattern:}
+\begin{itemize}
+\item $A(H)$: R$^2$ = 0.94, 0.94, 0.96
+\item $B(H)$: R$^2$ = 0.95, 0.94, 0.96
+\item $H^* = 3.69 \pm 0.19$ (crossover)
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{Physical interpretation:}
+\begin{itemize}
+\item $H < H^*$: $B < 0$, $\alpha$ \textit{decreases} with rank
+    \begin{itemize}
+    \item[$\to$] Steep head, flat tail
+    \item[$\to$] Model is ``committed''
+    \end{itemize}
+\item $H > H^*$: $B > 0$, $\alpha$ \textit{increases} with rank
+    \begin{itemize}
+    \item[$\to$] Flat head, steep tail
+    \item[$\to$] Model is ``uncertain''
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Example} (Llama-70B, C4 data):
+\begin{footnotesize}
+\begin{tabular}{lcccc}
+H & $\alpha_{k=5}$ & $\alpha_{k=5000}$ & Trend \\
+\midrule
+0.02 & 2.60 & 1.28 & $\downarrow$ \\
+4.80 & 0.98 & 1.66 & $\uparrow$ \\
+\end{tabular}
+\end{footnotesize}
+\end{columns}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 9: Two Distinct Notions of On-Policy
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two Distinct Notions of ``On-Policy'' in LLMs}
+
+\textbf{Question:} When is text ``on-policy'' for a model like Llama-70B?
+
+\vspace{0.4cm}
+\begin{columns}
+\column{0.48\textwidth}
+\textbf{1. Style/Identity On-Policy}
+\begin{itemize}
+    \item Text matches the model's \textit{trained assistant style}
+    \item ``Does this sound like me?''
+    \item \textcolor{blue}{On-policy:} Llama chat responses (standard system prompt)
+    \item \textcolor{red}{Off-policy:} Qwen/OLMo/Gemma responses, different system prompts
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Key feature:} Surface-level stylistic match
+
+\column{0.48\textwidth}
+\textbf{2. Generation Mode On-Policy}
+\begin{itemize}
+    \item Model is \textit{actively generating} (not just processing)
+    \item ``Am I producing this or reading it?''
+    \item \textcolor{blue}{On-policy:} Any text Llama generates (chat, continuations, any system prompt)
+    \item \textcolor{red}{Off-policy:} Any prefilled/external text
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Key feature:} Settled into generation mode
+\end{columns}
+
+\vspace{0.4cm}
+\textbf{Core question:} Does the model track both, or just one? Can we disentangle them?
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 10: Experimental Setup for Style-Based Detection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Experimental Setup: Testing Style-Based On-Policy Detection}
+
+\textbf{Hypothesis:} Llama-70B can distinguish its own assistant-style responses from other models' responses.
+
+\vspace{0.4cm}
+\textbf{Training Data:}
+\begin{columns}
+\column{0.48\textwidth}
+\textbf{On-Policy} (Llama-generated):
+\begin{itemize}
+    \item Llama-70B-Instruct chat responses
+    \item ShareGPT prompts, standard system prompt
+    \item $\sim$13k assistant tokens
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{Off-Policy} (Other models via Llama):
+\begin{itemize}
+    \item Qwen 72B/7B responses
+    \item OLMo 7B responses
+    \item Gemma 27B responses
+    \item $\sim$15k assistant tokens (processed through Llama)
+\end{itemize}
+\end{columns}
+
+\vspace{0.4cm}
+\textbf{Method:}
+\begin{itemize}
+    \item Train logistic regression probes per layer on assistant tokens
+    \item Steering vectors: $\vec{v} = \mu_{\text{on-policy}} - \mu_{\text{off-policy}}$
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Next steps:} Collect matched data with varied system prompts to test generalization and disentangle the two notions.
+
+% SOURCE: /workspace-vast/asving/surprise-experiment/controlled_authorship/probe_v2/cache/
+% Training scripts: collect_varied_system_prompts.py, collect_qwen_varied_system_prompts.py
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 11: Validation - Llama with Varied System Prompts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Validation: Probes on Llama with Varied System Prompts}
+
+\textbf{Test:} Apply V2 probes to Llama-70B responses generated with \textit{different} system prompts.
+
+\vspace{0.3cm}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{table}
+\centering
+\begin{footnotesize}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Layer} & \textbf{P(on-policy)} & \textbf{Std} \\
+\midrule
+0 & 0.53 & 0.40 \\
+20 & 0.50 & 0.48 \\
+40 & 0.42 & 0.48 \\
+60 & 0.54 & 0.48 \\
+70 & 0.45 & 0.48 \\
+\midrule
+\textbf{73} & \textbf{0.12} & 0.31 \\
+\textbf{76} & \textbf{0.07} & 0.24 \\
+\textbf{79} & \textbf{0.17} & 0.35 \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+\caption{n=2,998 assistant tokens}
+\end{table}
+
+\column{0.5\textwidth}
+\textbf{Key finding:}
+\begin{itemize}
+    \item Layers 0--70: \textbf{Uncertain} (P $\approx$ 0.5)
+    \item Layers 73--79: \textbf{Confidently OFF-policy} (P $\approx$ 0.1)
+\end{itemize}
+
+\end{columns}
+
+% SOURCE: /workspace-vast/asving/surprise-experiment/controlled_authorship/probe_v2/cache/system_prompt_validation_activations.npz
+% Validation script inline in Claude Code session (2026-01-27)
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 12: Temperature Effects on V2 Probes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{V2 Probe Behavior: Temperature and Position Effects}
+
+\begin{columns}
+\column{0.5\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/probe_v2_temp_by_layer.png}
+
+\textbf{P(off-policy) vs Temperature} by layer
+
+\column{0.5\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/probe_v2_position_by_temp_topleft.png}
+
+\textbf{P(off-policy) vs Position} by temperature (all questions averaged)
+\end{columns}
+
+% SOURCE: /workspace-vast/asving/surprise-experiment/controlled_authorship/results/temperature_sweep_v2/
+% Plots: probe_v2_temp_by_layer.png, probe_v2_position_by_temp.png (top-left panel extracted)
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SLIDE 13: Self-Recognition Steering with On/Off-Policy Vectors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Self-Recognition Steering: On/Off-Policy Vectors at L60-73}
+
+\textbf{Setup:} Steer Llama-70B on self-recognition task using $\vec{v} = \mu_{\text{on}} - \mu_{\text{off}}$ at layers 60--73.
+
+\vspace{0.3cm}
+\begin{columns}
+\column{0.35\textwidth}
+\begin{table}
+\centering
+\begin{footnotesize}
+\begin{tabular}{lc}
+\toprule
+\textbf{Magnitude} & \textbf{P(Me)} \\
+\midrule
+$+$2.0 & 0.97 \\
+$+$1.0 & 0.94 \\
+$+$0.5 & 0.57 \\
+Baseline & 0.48 \\
+$-$1.0 & 0.53 \\
+$-$2.0 & 0.35 \\
+$-$3.0 & 0.18 \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+\end{table}
+
+\column{0.65\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/position_steering_v2_only.png}
+\end{columns}
+
+\vspace{0.3cm}
+\textbf{Finding:} Positive steering towards self-claim is easy (1 token sufficient); negative steering requires more effort ($\sim$10 tokens).
+
+% SOURCE: /workspace-vast/asving/surprise-experiment/controlled_authorship/results/selfrecog_onoff_steering_late_results.json
+% SOURCE: /workspace-vast/asving/surprise-experiment/controlled_authorship/results/selfrecog_position_steering_results.json
+% Plot: /workspace-vast/asving/surprise-experiment/controlled_authorship/results/position_steering_comparison.png
+\end{frame}
+
+\end{document}
